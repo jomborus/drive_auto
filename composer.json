@@ -1,0 +1,18 @@
+{
+    "name": "jomborus/drive_auto",
+    "description": "parser drive2-auto",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "jomborus",
+            "email": "jomborus@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+	"autoload": {
+		"classmap": ["src"]
+	},
+    "require": {
+		"jomborus/drive_auto": "dev-master"
+	}
+}
