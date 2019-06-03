@@ -1,15 +1,30 @@
 <?php
 
+$A = new Drive2_auto;
+if(isset($_POST['proces']) && $_POST['proces'] == 1)
+	$A->GetBase();
+if(isset($_POST['proces']) && $_POST['proces'] == 2)
+	$A->GetInfo();
+
+print '<form action="" method="post">
+			<p><select name="proces">
+			<option selected disabled>Чего вы хотите от этой программы?</option>
+			<option value="1">хотите вывести информацию из базы данных?</option>
+			<option value="2">хотите спарсить информацию с сайта?</option>
+			</select></p>
+			<p><input type="submit" value="Отправить запрос"></p>
+			</form>';
+
 class Drive2_auto { 
     private $__base = 'drive2-auto'; 
     private $__table = 'parser'; 
 	
-	function Choice_Base_Table($base, $table){
+	public function Choice_Base_Table($base, $table){
 		$this->__base = $base; 
 		$this->__table = $table; 
 	}
     
-    function GetInfo() {
+    public function GetInfo() {
 		
 		$ch = curl_init(); 
 		curl_setopt($ch, CURLOPT_URL, "example.com"); 
@@ -35,10 +50,8 @@ class Drive2_auto {
 
 		for ($key_mark = 2; $key_mark < $count_marks; ++$key_mark) {
 	
-	
-			curl_setopt($ch, CURLOPT_URL, "https://www.drive2.ru".trim($marks[1][$key_mark])); 
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
-			$html_str_cars = curl_exec($ch); 
+
+			$html_str_cars = file_get_contents("https://www.drive2.ru".$marks[1][$key_mark]);
 
 			$modells = array();
 			preg_match_all('#<a[^>]+?class\s*?=\s*?["\']c-link c-link--text["\'][^>]+?href=["\'](.+?)["\'][^>]*?>(.+?)</a>#su', $html_str_cars, $modells);
@@ -73,11 +86,11 @@ class Drive2_auto {
 					curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
 					$html_str_cars = curl_exec($ch); 
 			
-					preg_match_all('#<ul[^>]+?class\s*?=\s*?["\']list-compact["\'][^>]*?>(.+?)</ul>#su', $html_str_cars, $marks);
+					preg_match_all('#<ul[^>]+?class\s*?=\s*?["\']list-compact["\'][^>]*?>(.+?)</ul>#su', $html_str_cars, $marks1);
 			
 					$passport = '';
-					if(isset($marks[1][0])){
-						preg_match_all('#>([^<]+?)</li>#su', $marks[1][0], $titul);
+					if(isset($marks1[1][0])){
+						preg_match_all('#>([^<]+?)</li>#su', $marks1[1][0], $titul);
 			
 						foreach ($titul[1] as $value) {
 							$passport .= trim($value).'; ';
@@ -89,13 +102,6 @@ class Drive2_auto {
 		
 				}
 			}
-		}
-
-		$query = "SELECT * FROM parser";
-		$result = mysqli_query($link, $query);
-		while (  $row  =  mysqli_fetch_row($result)  )
-		{
-		    print "<br>car_name: $row[0]<br>car_link: $row[1]<br>user_name: $row[2]<br>user_link: $row[3]<br>address: $row[4]<br>";
 		}
 
 		curl_close($ch);  
@@ -111,7 +117,7 @@ class Drive2_auto {
 		$result = mysqli_query($link, $query);
 		while (  $row  =  mysqli_fetch_row($result)  )
 		{
-		    print "<br>car_name: $row[0]<br>car_link: $row[1]<br>user_name: $row[2]<br>user_link: $row[3]<br>address: $row[4]<br>";
+		    print "<br>car_name: $row[0]<br>car_link: $row[1]<br>user_name: $row[2]<br>user_link: $row[3]<br>address: $row[4]<br>passport: $row[5]<br>";
 		};
 		mysqli_close($link);
     } 
