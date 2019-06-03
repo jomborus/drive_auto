@@ -10,8 +10,8 @@ foreach ($arr_msql as $key => $value) {
 
 
 $A = new Drive2_auto;
-
-$A->Choice_Base($arr_msql[0], $arr_msql[1], $arr_msql[2], $arr_msql[3], 'parser');
+print $arr_msql[0].' , '.$arr_msql[1].' , '.$arr_msql[2].' , '.$arr_msql[3];
+//$A->Choice_Base($arr_msql[0], $arr_msql[1], $arr_msql[2], $arr_msql[3], 'parser');
 
 if(isset($_POST['seach_marks']))
 	$proces_marks = $_POST['seach_marks'];
@@ -34,18 +34,20 @@ $marks = array();
 preg_match_all('#<a[^>]+?class\s*?=\s*?["\']c-link c-link--text["\'][^>]+?href=["\'](.+?)["\'][^>]*?>(.+?)</a>#su', $html_str, $marks);
 $count_marks = count($marks[1]);
 
-$result = '<form action="" method="post">
-			<p><select name="proces_all">
-			<option selected value="m">Чего вы хотите от этой программы?</option>
-			<option value="1">хотите вывести информацию из базы данных?</option>
-			<option value="2">хотите спарсить информацию с сайта?</option>
-			</select></p>';
+
+$result = '<form action="" method="post">';
 
 $result .= '<p><select name="seach_marks"><option selected value="m">Какая марка вас интересует?</option>';
 for ($key_mark = 2; $key_mark < $count_marks; ++$key_mark){
-	$result .= '<option value="'.$marks[1][$key_mark].'">'.$marks[2][$key_mark].'</option>';
+	if($marks[1][$key_mark] == $proces_marks)
+		$result .= '<option selected value="'.$marks[1][$key_mark].'">'.$marks[2][$key_mark].'</option>';
+	else
+		$result .= '<option value="'.$marks[1][$key_mark].'">'.$marks[2][$key_mark].'</option>';
 }
 $result .= '</select>';
+
+
+$result .=	'	<p><input type="submit" value="модели"></p>';
 
 if(isset($_POST['seach_marks'])){
 	
@@ -60,8 +62,16 @@ if(isset($_POST['seach_marks'])){
 		$result .= '<option value="'.$modells[1][$key_modell].'">'.$modells[2][$key_modell].'</option>';
 	}
 	$result .= '</select>';
-
+	
 }
+
+	$result .= '
+			<p><select name="proces_all">
+			<option selected value="m">Чего вы хотите от этой программы?</option>
+			<option value="1">хотите вывести информацию из базы данных?</option>
+			<option value="2">хотите спарсить информацию с сайта?</option>
+			</select></p>';
+
 $result .=	'	<p><input type="submit" value="Отправить запрос"></p>
 			</form>';
 
@@ -106,7 +116,7 @@ class Drive2_auto {
 		preg_match_all('#<a[^>]+?class\s*?=\s*?["\']c-link c-link--text["\'][^>]+?href=["\'](.+?)["\'][^>]*?>(.+?)</a>#su', $html_str, $marks);
 		$count_marks = count($marks[1]);
 
-		for (; $key_mark < $count_marks; ++$key_mark) {
+		for ($key_mark = 2; $key_mark < $count_marks; ++$key_mark) {
 
 			if($link_marks == 'm' || $link_marks == $marks[1][$key_mark]){
 			$html_str_cars = file_get_contents("https://www.drive2.ru".$marks[1][$key_mark]);
